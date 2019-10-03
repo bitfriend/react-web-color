@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
@@ -13,17 +13,48 @@ const { Fragment } = React;
 // 4. Currently selected items should be visually highlighted.
 // 5. Currently selected items' names should be shown at the top of the page.
 
-const List = ({ items }) => (
-  <Fragment>
-    <ul className="List">
-      {items.map(item => (
-        <li key={item.name} className={`List__item List__item--${item.color}`}>
-          {item.name}
-        </li>
-      ))}
-    </ul>
-  </Fragment>
-);
+const onClick = (index, selected, setSelected) => {
+  const found = selected.findIndex(selItem => selItem === index);
+  let newSelected = [];
+  if (found === -1) {
+    newSelected = [...selected, index];
+  } else {
+    newSelected = [...selected.slice(0, found), ...selected.slice(found + 1)];
+  }
+  setSelected(newSelected);
+}
+
+const List = ({ items }) => {
+  const [selected, setSelected] = useState([]);
+  return (
+    <Fragment>
+      <ul className="Chosen">
+        {items.map((item, index) => {
+          const found = selected.findIndex(selItem => selItem === index);
+          if (found === -1) {
+            return null;
+          } else {
+            return (
+              <li key={index}>{item.name}</li>
+            );
+          }
+        })}
+      </ul>
+      <ul className="List">
+        {items.map((item, index) => {
+          const found = selected.findIndex(selItem => selItem === index);
+          return (
+            <li key={item.name} className={`List__item List__item--${item.color}`} onClick={() => onClick(index, selected, setSelected)}>
+              <div className={`${found !== -1 && 'selected'}`}>
+                {item.name}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </Fragment>
+  );
+};
 
 // ---------------------------------------
 // Do NOT change anything below this line.
